@@ -34,8 +34,8 @@ const SearchUser = () => {
       {/* Search Header */}
       <div className="max-w-2xl mx-auto mb-8">
         <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
-            🔍 Search Developers
+          <h2 className="text-2xl p-2 font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
+               Search Developers
           </h2>
           
           <div className="flex gap-2">

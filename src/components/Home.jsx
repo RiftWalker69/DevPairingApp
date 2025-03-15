@@ -132,7 +132,7 @@ const Home = () => {
                     👤
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg">@{developer.username}</h4>
+                    <h4 className="font-bold text-lg"> {developer.displayName}</h4>
                     <p className="text-gray-400">{developer.skills?.slice(0, 3).join(", ")}{developer.skills?.length > 3 ? "..." : ""}</p>
                   </div>
                 </div>

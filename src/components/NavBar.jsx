@@ -27,7 +27,7 @@ const NavBar = ({ searchQuery, setSearchQuery, handleSearch, setShowProfileModal
             />
             <button
               onClick={handleSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-500 p-2 rounded-full hover:bg-blue-600 transition-colors"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-500 p-1 rounded-full hover:bg-blue-600 transition-colors"
             >
               🔍
             </button>
@@ -37,6 +37,12 @@ const NavBar = ({ searchQuery, setSearchQuery, handleSearch, setShowProfileModal
 
       {/* Buttons - Right */}
       <div className="flex items-center space-x-4">
+        <button
+          onClick={() => window.location.href = '/chat'}
+          className="flex items-center space-x-2 bg-gray-700 px-4 py-2 rounded-full hover:bg-gray-600 transition-colors"
+        >
+          💬 <span>Chat</span>
+        </button>
         <button
           onClick={onViewProfile}
           className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-xl hover:opacity-90 transition-opacity"

@@ -9,6 +9,8 @@ const ProfileForm = ({ onComplete }) => {
   const [availability, setAvailability] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(true);
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
   const [existingUsername, setExistingUsername] = useState(""); // Store current username
   const user = auth.currentUser;
 
@@ -25,6 +27,8 @@ const ProfileForm = ({ onComplete }) => {
           setSkills(data.skills?.join(", ") || "");
           setExperience(data.experience || "");
           setAvailability(data.availability || "");
+          setDisplayName(data.displayName || "");
+          setEmail(data.email || "");
         }
       };
       fetchUserData();
@@ -73,6 +77,8 @@ const ProfileForm = ({ onComplete }) => {
         skills: skills.split(",").map((s) => s.trim()),
         experience,
         availability,
+        displayName,
+        email,
       },
       { merge: true }
     );

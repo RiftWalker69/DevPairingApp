@@ -73,7 +73,7 @@ const UserProfile = ({ userData, isOwnProfile = false }) => {
             👤
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-white">@{userData.username || 'Loading...'}</h2>
+            <h2 className="text-3xl font-bold text-white">@{userData.displayName || 'Loading...'}</h2>
             <p className="text-gray-400">{userData.email || ''}</p>
             <div className="flex items-center space-x-4 mt-2">
               <span className="text-gray-300">
