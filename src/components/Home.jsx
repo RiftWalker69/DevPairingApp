@@ -1,56 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { motion } from "framer-motion";
 import ProfileForm from "./ProfileForm";
+import NavBar from "./NavBar";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [userData, setUserData] = useState(null);
   const user = auth.currentUser;
 
   useEffect(() => {
+    const checkUserProfile = async () => {
+      if (auth.currentUser) {
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        // If user document doesn't exist, show the profile modal
+        if (!userDoc.exists()) {
+          setShowProfileModal(true);
+        }
+      }
+    };
+
+    checkUserProfile();
+  }, [auth.currentUser]); // Add dependency on auth.currentUser
+
+  useEffect(() => {
     if (user) {
-      checkUserProfile(user);
+      fetchUserProfile(user);
     }
   }, [user]);
 
-  // Check if user has profile data
-  const checkUserProfile = async (user) => {
+  // Fetch user profile & check if profile is incomplete
+  const fetchUserProfile = async (user) => {
     if (!user) return;
 
     const userRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(userRef);
 
-    if (
-      !docSnap.exists() ||
-      !docSnap.data().skills ||
-      !docSnap.data().experience ||
-      !docSnap.data().availability
-    ) {
-      setShowProfileModal(true); // Show profile form if missing data
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setUserData(data);
+
+      if (!data.skills || !data.experience || !data.availability) {
+        setShowProfileModal(true); // Open modal if profile is incomplete
+      }
     }
   };
 
-  // Search users by username or skills
+  // Search developers by username or skills
   const handleSearch = async () => {
     if (searchQuery.trim() === "") return;
 
     const usersRef = collection(db, "users");
     const usernameQuery = query(usersRef, where("username", "==", searchQuery));
-    const skillsQuery = query(
-      usersRef,
-      where("skills", "array-contains", searchQuery)
-    );
+    const skillsQuery = query(usersRef, where("skills", "array-contains", searchQuery));
 
     try {
       const usernameResults = await getDocs(usernameQuery);
@@ -61,10 +69,8 @@ const Home = () => {
         ...skillsResults.docs.map((doc) => doc.data()),
       ];
 
-      // Remove duplicates
-      const uniqueUsers = Array.from(
-        new Map(users.map((u) => [u.uid, u])).values()
-      );
+      // Remove duplicate results
+      const uniqueUsers = Array.from(new Map(users.map((u) => [u.uid, u])).values());
       setSearchResults(uniqueUsers);
     } catch (error) {
       console.error("Error searching users:", error);
@@ -73,76 +79,72 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Navbar */}
-      <nav className="bg-gray-800 p-4 flex justify-between items-center">
-        <h2 className="text-lg font-bold">{user?.displayName || "User"}</h2>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Search by username or skill"
-            className="border rounded px-2 py-1 text-black"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button
-            onClick={handleSearch}
-            className="bg-blue-500 px-4 py-1 rounded hover:bg-blue-600"
-          >
-            Search
-          </button>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowProfileModal(true)}
-            className="bg-green-500 px-4 py-1 rounded hover:bg-green-600"
-          >
-            Edit Profile
-          </button>
-          <button
-            onClick={() => signOut(auth)}
-            className="bg-red-500 px-4 py-1 rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+      <NavBar 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        handleSearch={handleSearch}
+        setShowProfileModal={setShowProfileModal}
+      />
 
-      {/* Search Results */}
-      <div className="p-4">
+      {/* User Profile Section */}
+      {userData && (
+        <div className="max-w-2xl mx-auto mt-8 p-6 bg-gray-800 rounded-lg shadow-md">
+          <h3 className="text-2xl font-semibold text-blue-400">@{userData.username}</h3>
+          <div className="mt-3 text-gray-300">
+            <p><span className="font-bold text-blue-300">🛠 Skills:</span> {userData.skills?.join(", ") || "Not set"}</p>
+            <p><span className="font-bold text-green-300">📈 Experience:</span> {userData.experience || "Not set"}</p>
+            <p><span className="font-bold text-purple-300">⏳ Availability:</span> {userData.availability || "Not set"}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Search Results Section */}
+      <div className="p-6 max-w-3xl mx-auto">
         {searchResults.length > 0 ? (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <h3 className="text-xl font-bold mb-4">Search Results</h3>
-            <ul>
-              {searchResults.map((user) => (
-                <li
-                  key={user.uid}
-                  className="border p-2 rounded mb-2 bg-gray-800"
-                >
-                  <h4 className="font-semibold">@{user.username}</h4>
-                  <p>
-                    <strong>Skills:</strong> {user.skills?.join(", ")}
-                  </p>
-                  <p>
-                    <strong>Experience:</strong> {user.experience}
-                  </p>
-                  <p>
-                    <strong>Availability:</strong> {user.availability}
-                  </p>
-                </li>
-              ))}
-            </ul>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            {searchResults.map((developer) => (
+              <div
+                key={developer.uid}
+                className="bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-blue-400 transition-colors"
+              >
+                <div className="flex items-start space-x-4">
+                  <div className="bg-blue-400 rounded-full h-10 w-10 flex items-center justify-center">
+                    👤
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg">@{developer.username}</h4>
+                    <div className="space-y-2 mt-2 text-gray-300">
+                      <p className="flex items-center space-x-2">
+                        <span className="text-blue-400">🛠</span>
+                        <span>{developer.skills?.join(" · ")}</span>
+                      </p>
+                      <p className="flex items-center space-x-2">
+                        <span className="text-green-400">📈</span>
+                        <span>{developer.experience}</span>
+                      </p>
+                      <p className="flex items-center space-x-2">
+                        <span className="text-purple-400">⏳</span>
+                        <span>{developer.availability}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </motion.div>
         ) : (
-          <p className="text-gray-400 mt-4">No users found.</p>
+          <div className="text-center py-12 text-gray-400">
+            🔍 Search for developers by username or skills
+          </div>
         )}
       </div>
 
       {/* Profile Form Modal */}
       {showProfileModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-black">
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
+          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-gray-800 rounded-2xl p-6 w-full max-w-lg">
             <ProfileForm onComplete={() => setShowProfileModal(false)} />
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

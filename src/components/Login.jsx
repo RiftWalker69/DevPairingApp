@@ -14,41 +14,45 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <motion.h2
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-4xl font-bold mb-8 text-blue-400"
-      >
-        Developer Pairing App
-      </motion.h2>
-
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="flex flex-col space-y-4"
-      >
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="text-center space-y-8"
+  >
+    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
+      DevPair
+    </h1>
+    
+    <div className="bg-gray-800 p-8 rounded-3xl shadow-xl space-y-6">
+      <h2 className="text-2xl font-semibold text-gray-100">
+        Connect with Developers Worldwide
+      </h2>
+      
+      <div className="space-y-4">
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => handleLogin(googleProvider)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-lg"
+          className="w-full bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-full flex items-center justify-center space-x-3 transition-colors"
         >
-          Sign in with Google
+          <span className="text-2xl">🔵</span>
+          <span className="font-medium text-gray-100">Continue with Google</span>
         </motion.button>
 
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => handleLogin(githubProvider)}
-          className="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-lg"
+          className="w-full bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-full flex items-center justify-center space-x-3 transition-colors"
         >
-          Sign in with GitHub
+          <span className="text-2xl">⚫</span>
+          <span className="font-medium text-gray-100">Continue with GitHub</span>
         </motion.button>
-      </motion.div>
+      </div>
     </div>
+  </motion.div>
+</div>
   );
 };
 
